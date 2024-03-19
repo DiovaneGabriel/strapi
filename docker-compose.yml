@@ -1,0 +1,37 @@
+version: '3'
+services:
+  strapi-app:
+    container_name: node
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./app:/app
+    ports:
+      - "1337:1337"
+    command: yarn develop
+    networks:
+      strapi:
+    depends_on:
+      - strapi-mariadb
+
+  strapi-mariadb:
+    image: mariadb:latest
+    container_name: "mariadb"
+    volumes:
+      - strapi-data:/var/lib/mysql
+      - .docker/mariadb/scripts:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_PASSWORD: strapi
+      MYSQL_ROOT_PASSWORD: strapi
+    command: --init-file /docker-entrypoint-initdb.d/create-database.sql
+    networks:
+      strapi:
+
+networks:
+  strapi:
+    external: true
+
+volumes:
+  strapi-data:
