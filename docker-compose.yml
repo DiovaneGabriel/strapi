@@ -5,7 +5,7 @@ services:
     image: node:20-alpine
     working_dir: /app
     volumes:
-      - ./app:/app
+      - ./:/app
     ports:
       - "1337:1337"
     command: yarn develop
