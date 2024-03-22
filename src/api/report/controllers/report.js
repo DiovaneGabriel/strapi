@@ -11,14 +11,21 @@ module.exports = createCoreController("api::report.report", ({ strapi }) => ({
     const user = ctx.state.user;
 
     if (!user) {
-      return ctx.badRequest("Usuário não autenticado");
+      return ctx.badRequest();
     }
 
-    return { success: true };
+    const clients = await strapi.entityService.findMany("api::client.client", {
+      filters: { users: user.id },
+      populate: ["reports"],
+    });
 
-    // // Supondo que a relação seja chamada 'clients'
-    // const clients = await strapi.query('clients').find({ users: user.id });
+    const reports = clients.reduce((acc, client) => {
+      if (client.reports && client.reports.length) {
+        acc.push(...client.reports);
+      }
+      return acc;
+    }, []);
 
-    // return clients;
+    return reports;
   }
 }));
